@@ -1,0 +1,65 @@
+import requests
+import random
+
+OMDB_API_KEY = "2969237b"  
+# Define moods and sample keyword queries
+mood_keywords = {
+    "happy": ["comedy", "feel good", "family", "animated"],
+    "sad": ["drama", "tragedy", "emotional"],
+    "excited": ["action", "thriller", "spy", "heist"],
+    "romantic": ["romance", "love", "date night"],
+    "scared": ["horror", "ghost", "paranormal"],
+    "relaxed": ["musical", "documentary", "lighthearted"],
+    "adventurous": ["adventure", "fantasy", "epic"]
+}
+print('''MOODS ARE:
+Happy
+SAD
+EXCITED
+ROMANTIC
+SCARED
+RELAXED
+ADVENTUROUS\n\n\n''')
+def get_movies_from_omdb(keyword):
+    url = f"https://www.omdbapi.com/?apikey=2969237b&s={keyword}&type=movie"
+    response = requests.get(url)
+    data = response.json()
+    
+    if "Search" not in data:
+        return ["No results found for this mood."]
+    
+    movies = data["Search"][:5]
+    return [f"{m['Title']} ({m['Year']})" for m in movies]
+
+def recommend_movies_by_mood(mood):
+    mood = mood.lower()
+    if mood not in mood_keywords:
+        return ["❌ Mood not recognized."]
+    
+    keyword = random.choice(mood_keywords[mood])
+
+    print(f"\n🔍 Searching for '{keyword}' themed movies...")
+    return get_movies_from_omdb(keyword)
+
+# Example usage
+user_mood = input("WHAT'S YOUR MOOD TODAY 😄:")
+recommendations = recommend_movies_by_mood(user_mood)
+
+print("\n🎬 Here are your movie vibes:")
+
+for movie in recommendations:
+    print(f" - {movie}")
+
+while True: 
+    a = input("Want to find some other movies from that mood (YES/NO): ")
+    if a.lower() == "yes":
+        recommendations = recommend_movies_by_mood(user_mood)
+        print(f"\n🔍 Searching for {user_mood} themed movies...")
+        for movie in get_movies_from_omdb(random.choice(mood_keywords[user_mood.lower()])):
+            print(f" - {movie}")
+    elif a.lower() == "no":
+
+        print("Okay, goodbye! 👋")
+        break
+    else:
+        print("Please enter 'yes' or 'no'.")
